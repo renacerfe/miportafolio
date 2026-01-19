@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Método OPICA</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <div class="logo">Mi Portafolio</div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="clases.html">Clases</a></li>
+                    <li><a href="metodo-opica.html" class="active">Método OPICA</a></li>
+                    <li><a href="metodosistematico.html">Método Sistemático</a></li>
+                    <li><a href="sincosolas.html">Doctrina</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container content-area">
+        <h1 class="page-title">El Método OPICA</h1>
+        
+        <div class="hero-centered">
+            <div class="hero-image">
+                <img src="infografia metodo O.P.I.C.A.png" alt="Infografía Método OPICA" onclick="openModal(this)">
+            </div>
+        </div>
+        
+        <section>
+            <h2>Video Explicativo</h2>
+            <div class="video-container">
+                <video controls>
+                    <source src="video/El_Método_O.P.I.C.mp4" type="video/mp4">
+                    Tu navegador no soporta videos HTML5.
+                </video>
+            </div>
+        </section>
+
+        <section>
+            <h2>¿En qué consiste?</h2>
+            <p>El método OPICA es una estrategia didáctica diseñada para fomentar el aprendizaje activo...</p>
+        </section>
+
+        <section class="fases-lista">
+            <h2>Fases del Método</h2>
+            <ul>
+                <li><strong>O</strong>bservación: Análisis inicial del problema.</li>
+                <li><strong>P</strong>ráctica: Ejercicios guiados.</li>
+                <li><strong>I</strong>nteracción: Trabajo colaborativo.</li>
+                <li><strong>C</strong>omprensión: Evaluación del entendimiento.</li>
+                <li><strong>A</strong>plicación: Uso del conocimiento en contextos reales.</li>
+            </ul>
+        </section>
+
+        <!-- Nueva Sección: Documentación Técnica Detallada -->
+        <section>
+            <h2>Documentación Técnica: Profundización del Método</h2>
+            <a href="pdf/El_Método_OPICA_De_Superficialidad_a_Transformación.pdf" target="_blank" class="btn-outline">📄 Descargar Documentación PDF</a>
+            
+            <h3>1. Introducción</h3>
+            <p>El método <strong>O.P.I.C.A.</strong> (Observar, Preguntar, Investigar, Conectar, Aplicar) es un enfoque inductivo superior a la lectura superficial. A diferencia de métodos deductivos que buscan confirmar ideas preconcebidas, este método disciplina al estudiante para silenciar su propia voz y permitir que el texto hable por sí mismo.</p>
+
+            <h3>2. Fundamentos Bíblicos</h3>
+            <p>Este método descansa sobre bases bíblicas sólidas:</p>
+            <ul>
+                <li><strong>Nehemías 8:3, 8:</strong> El modelo de lectura atenta y explicación clara para "poner el sentido".</li>
+                <li><strong>Hechos 17:11:</strong> El ejemplo de los bereanos, quienes recibían la palabra con solicitud pero la sometían al <strong>escrutinio diario</strong>.</li>
+                <li><strong>Lucas 24:27:</strong> La hermenéutica de Cristo, conectando todas las Escrituras consigo mismo.</li>
+                <li><strong>2 Timoteo 3:17:</strong> El objetivo final: estar enteramente preparados para toda buena obra.</li>
+            </ul>
+
+            <h3>3. Desglose del Método</h3>
+            
+            <h4>O - Observar</h4>
+            <p>Mirar con atención los detalles. <em>Ejemplo:</em> En <strong>Filipenses 4:4-7</strong>, la observación de los conectores lógicos revela la relación causa-efecto entre la oración y la paz de Dios.</p>
+
+            <h4>P - Preguntar</h4>
+            <p>Interrogar al texto para extraer su significado. <em>Ejemplo:</em> En el <strong>Salmo 51:6</strong> ("tú amas la verdad en lo íntimo"), preguntamos: ¿Qué implica "lo íntimo" para Dios?</p>
+
+            <h4>I - Investigar</h4>
+            <p>Comparar Escritura con Escritura. <em>Ejemplo:</em> Resolver la tensión entre <strong>Romanos 3:24</strong> y <strong>Santiago 2:24</strong> sobre la justificación, entendiendo sus contextos.</p>
+
+            <h4>C - Conectar</h4>
+            <p>Vincular el pasaje con la gran narrativa bíblica. <em>Ejemplo:</em> Conectar el <strong>Tabernáculo</strong> del A.T. con <strong>Juan 1:14</strong> (el Verbo "tabernaculizó" entre nosotros).</p>
+
+            <h4>A - Aplicar</h4>
+            <p>Diferenciar la emoción de la acción. <em>Ejemplo:</em> En el <strong>Buen Samaritano</strong>, la aplicación no es sentir lástima, sino la acción volitiva de ayudar ("Ve y haz tú lo mismo").</p>
+
+            <h3>4. Conclusión</h3>
+            <p>Es vital silenciar nuestros prejuicios para que la Palabra hable con autoridad, transformándonos de meros lectores a hacedores de la verdad.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Yo Renacere, en el Rio de tu Espiritu</p>
+    </footer>
+
+    <!-- Modal para imagen completa -->
+    <div id="imageModal" class="modal" onclick="this.style.display='none'">
+        <span style="position:absolute; top:20px; right:30px; color:white; font-size:40px; cursor:pointer;">&times;</span>
+        <img class="modal-content" id="imgExpanded">
+    </div>
+
+    <script>
+        function openModal(element) {
+            document.getElementById("imageModal").style.display = "block";
+            document.getElementById("imgExpanded").src = element.src;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metodología de Investigación Bíblica: El Orden Correcto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Lato', sans-serif; background-color: #f4f6f8; color: #2d3748; }
+        h1, h2, h3, .serif { font-family: 'Merriweather', serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .step-card { transition: all 0.3s ease; border-left: 4px solid transparent; }
+        .step-card.active { border-left-color: #d4af37; background-color: #fff; transform: translateX(5px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .step-card:hover { background-color: #fff; cursor: pointer; }
+        
+        /* Custom scrollbar for content area */
+        .content-scroll::-webkit-scrollbar { width: 6px; }
+        .content-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .content-scroll::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+        .content-scroll::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+        
+        @keyframes zoom { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-zoom { animation: zoom 0.3s ease-out; }
+    </style>
+    <!-- Chosen Palette: Academic Parchment (Warm Neutrals with Deep Leather Accents). 
+         Background: #fcfbf9 (Off-white/Paper), Text: #2d3748 (Dark Gray), 
+         Primary: #744210 (Leather Brown), Secondary: #c05621 (Terracotta), 
+         Accent: #2b6cb0 (Academic Blue for diagrams). -->
+    
+    <!-- Application Structure Plan: 
+         The app is designed as a "Linear Progression Study Tool".
+         1. **Context & Foundation (Intro):** Sets the stage, explaining the danger of disorder.
+         2. **The 7-Step Ladder (Navigation):** A vertical list on the left allowing users to traverse the methods in order.
+         3. **The Study Desk (Main Content):** A dynamic pane that updates with the Definition, Importance, Errors, and Examples for the selected method.
+         4. **Visual Analysis (Dashboard):** Contains two charts. 
+            a) "The Exegetical Funnel" (Bar Chart) showing the scope of each method.
+            b) "The Hermeneutical Balance" (Radar Chart) which changes based on the selected step to show what happens when you focus ONLY on that step vs the whole picture.
+         This structure forces the user to see the steps as a connected chain, not isolated islands, reinforcing the "Order Matters" core message. -->
+
+    <!-- Visualization & Content Choices:
+         1. **The Exegetical Funnel (Chart.js Bar):**
+            - *Goal:* Inform the user about the scope of each method.
+            - *Method:* A centered bar chart. Broadest at "Historical" (World Context) narrowing down to "Hermeneutical" (Specific Application).
+            - *Interaction:* Static visual reference of the process shape.
+         2. **Impact Analysis (Chart.js Radar):**
+            - *Goal:* Relationships/Compare. Show how the current step contributes to the total understanding (Context, Meaning, Theology, Relevance).
+            - *Interaction:* Updates dynamically when a step is clicked. E.g., Historical method scores high on "Context" but low on "Relevance" if stopped there.
+         3. **Interactive Step Cards:** - *Goal:* Change/Inform. The core text content.
+            - *Method:* HTML/JS replacement.
+            - *Justification:* Text is heavy; accordion or tab switching keeps the UI clean.
+         4. **Summary Table (HTML Table):**
+            - *Goal:* Organize/Review. A quick reference guide at the bottom.
+    -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-[#f4f6f8] min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-[#1a2b49] text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl font-bold text-[#d4af37] serif">Yo Renacere</span>
+                <span class="hidden sm:inline-block text-gray-400">|</span>
+                <span class="hidden sm:inline-block text-sm text-gray-300 font-medium tracking-wide uppercase">Método Sistemático</span>
+            </div>
+            <nav class="hidden md:block">
+                <ul class="flex space-x-6 text-sm font-medium">
+                    <li><a href="index.html" class="hover:text-[#d4af37] transition">Inicio</a></li>
+                    <li><a href="clases.html" class="hover:text-[#d4af37] transition">Clases</a></li>
+                    <li><a href="metodo-opica.html" class="hover:text-[#d4af37] transition">Método OPICA</a></li>
+                    <li><a href="metodosistematico.html" class="text-[#d4af37]">Método Sistemático</a></li>
+                    <li><a href="sincosolas.html" class="hover:text-[#d4af37] transition">Doctrina</a></li>
+                </ul>
+            </nav>
+            <!-- Mobile Menu Button (Placeholder) -->
+            <div class="md:hidden text-[#d4af37]">☰</div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- Left Column: The Path (Navigation) -->
+        <div class="lg:col-span-4 flex flex-col space-y-6">
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-[#d4af37]">
+                <h2 class="text-lg font-bold text-[#1a2b49] mb-4 serif border-b pb-2">La Ruta Exegética</h2>
+                <p class="text-sm text-gray-600 mb-6 leading-relaxed">
+                    Una investigación seria no comienza con lo que el texto significa <em>para mí</em>, sino con lo que el texto <em>es</em>. Sigue el orden estricto para evitar herejías.
+                </p>
+                
+                <a href="pdf/Hermenutica 7 pilares.pdf" target="_blank" class="block w-full text-center mb-6 px-4 py-2 border border-[#1a2b49] text-[#1a2b49] rounded-lg text-sm font-bold hover:bg-[#1a2b49] hover:text-white transition shadow-sm">
+                    📄 Descargar PDF: 7 Pilares
+                </a>
+                
+                <!-- Navigation List -->
+                <div id="nav-list" class="space-y-2">
+                    <!-- Javascript will populate this -->
+                </div>
+            </div>
+
+            <!-- Visualization 1: The Funnel -->
+            <div class="bg-white rounded-xl shadow-md p-6 hidden lg:block">
+                <h3 class="text-sm font-bold text-[#1a2b49] uppercase tracking-wider mb-4">El Embudo Hermenéutico</h3>
+                <div class="chart-container h-48">
+                    <canvas id="funnelChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-2">De lo General (Historia) a lo Específico (Aplicación)</p>
+            </div>
+        </div>
+
+        <!-- Right Column: The Study (Content & Analysis) -->
+        <div class="lg:col-span-8 space-y-6">
+            
+            <!-- Dynamic Content Area -->
+            <div id="content-area" class="bg-white rounded-xl shadow-lg border-t-4 border-[#1a2b49] overflow-hidden min-h-[500px]">
+                <!-- Default Welcome State -->
+                <div class="p-8 md:p-12 text-center flex flex-col items-center justify-center h-full space-y-6">
+                    <img src="imagen sistematica.png" alt="Imagen Sistemática" class="max-w-full h-auto max-h-64 rounded-lg shadow-md mb-4">
+                    <img src="imagen sistematica.png" alt="Imagen Sistemática" class="max-w-full h-auto max-h-64 rounded-lg shadow-md mb-4 cursor-pointer hover:opacity-90 transition" onclick="openModal(this)">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-[#1a2b49] text-3xl font-serif font-bold mb-4">¶</div>
+                    <h2 class="text-3xl font-bold text-[#1a2b49] serif">El Orden Correcto</h2>
+                    <p class="text-lg text-gray-600 max-w-lg leading-relaxed">
+                        Bienvenido al seminario interactivo. Muchos cometen el error de saltar inmediatamente a la aplicación práctica, ignorando el abismo cultural, lingüístico e histórico.
+                    </p>
+                    <p class="text-md text-gray-500">
+                        Seleccione el <strong>Paso 1: Método Histórico</strong> en el menú para comenzar su investigación.
+                    </p>
+                    <button onclick="selectStep(0)" class="mt-6 px-6 py-3 bg-[#1a2b49] hover:bg-[#0f1a2e] text-[#d4af37] font-semibold rounded-full transition shadow-lg border border-[#1a2b49]">
+                        Iniciar Investigación
+                    </button>
+                </div>
+            </div>
+
+            <!-- Visualization 2: The Radar Balance -->
+             <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="flex flex-col md:flex-row items-center justify-between mb-4">
+                    <div>
+                         <h3 class="text-lg font-bold text-[#1a2b49] serif">Análisis de Enfoque</h3>
+                         <p class="text-sm text-gray-500">¿Qué aporta este método a la investigación total?</p>
+                    </div>
+                    <div class="mt-2 md:mt-0">
+                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                             Datos Dinámicos
+                         </span>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+    <!-- Footer Section: Summary Table -->
+    <section class="bg-gray-100 border-t border-gray-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-[#1a2b49] mb-8 serif text-center">Resumen Pedagógico General</h2>
+            <div class="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orden</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Método</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pregunta Clave</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peligro de Omisión</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-sm text-gray-700">
+                        <!-- Rows populated by JS -->
+                        <tbody id="summary-table-body"></tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-8 p-4 bg-red-50 border border-red-200 rounded-md flex items-start">
+                <div class="text-red-800 text-xl mr-3 font-bold">⚠</div>
+                <p class="text-red-800 text-sm font-medium">
+                    <strong>Advertencia Final:</strong> Invertir este orden (empezar por la teología o la aplicación) produce "eiségesis" (leer dentro del texto lo que uno quiere) en lugar de "exégesis" (extraer del texto lo que el autor dijo). La aplicación sin exégesis es pura emoción humana, no Palabra de Dios.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#1a2b49] text-white py-8 mt-auto border-t-4 border-[#d4af37]">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+            <p>Yo Renacere, en el Rio de tu Espiritu</p>
+        </div>
+    </footer>
+
+    <!-- Modal para imagen completa -->
+    <div id="sysModal" class="fixed inset-0 z-[100] hidden bg-black bg-opacity-90 flex items-center justify-center p-4 backdrop-blur-sm" onclick="closeModal()">
+        <span class="absolute top-5 right-8 text-white text-5xl cursor-pointer hover:text-[#d4af37] transition">&times;</span>
+        <img id="sysModalImg" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl animate-zoom">
+    </div>
+
+    <script>
+        // --- Data Source ---
+        const methodsData = [
+            {
+                id: 1,
+                title: "Método Histórico",
+                short: "1. Histórico",
+                icon: "🏛️",
+                definition: "Investiga el entorno espacio-temporal del autor y los destinatarios originales. Estudia la geografía, política, costumbres, economía y situación religiosa del momento.",
+                importance: "La Biblia no fue escrita en el vacío. Dios se reveló en la historia. Sin el contexto histórico, perdemos el anclaje de realidad.",
+                error: "El anacronismo. Juzgar acciones antiguas con criterios modernos o ignorar la brecha cultural (ej. no entender qué significaba un 'pacto de sal').",
+                question: "¿Qué significaba esto para los lectores originales en su momento y lugar?",
+                example: "<strong>El Buen Samaritano:</strong> Sin conocer la enemistad histórica/racial entre judíos y samaritanos (contexto), la parábola es solo una historia de 'ser amable', perdiendo su impacto de choque cultural y redefinición radical del prójimo.",
+                stats: { context: 10, grammar: 2, theology: 3, relevance: 1 },
+                color: "rgba(26, 43, 73, 0.7)" // primary blue
+            },
+            {
+                id: 2,
+                title: "Método Gramático-Exegético",
+                short: "2. Gramatical",
+                icon: "abc", // using text instead of svg
+                definition: "Analiza el texto en sus lenguas originales (Hebreo, Arameo, Griego). Estudia la sintaxis, morfología, semántica de las palabras y estructura de las oraciones.",
+                importance: "La inspiración llega hasta las palabras mismas. Una preposición o un tiempo verbal pueden cambiar todo el sentido teológico.",
+                error: "Alegorización infundada. Dar significados 'espirituales' a palabras sin base léxica, o ignorar la gramática básica para forzar una doctrina.",
+                question: "¿Qué dice exactamente el texto según las reglas del lenguaje en que fue escrito?",
+                example: "<strong>Juan 1:1:</strong> 'El Verbo era Dios'. El análisis gramatical del griego (predicado nominal sin artículo definido antes de 'Theos') refuta tanto al politeísmo como a la idea de que Jesús es un 'dios' menor.",
+                stats: { context: 4, grammar: 10, theology: 5, relevance: 2 },
+                color: "rgba(180, 83, 9, 0.7)" // orange/brown
+            },
+            {
+                id: 3,
+                title: "Método Literario",
+                short: "3. Literario",
+                icon: "📜",
+                definition: "Identifica el género literario (poesía, narrativa, profecía, carta, apocalíptica) y los recursos retóricos (quiasmo, paralelismo, metáfora).",
+                importance: "No se lee un Salmo (poesía emotiva) igual que el libro de Romanos (tratado lógico) o Apocalipsis (imágenes simbólicas). Las reglas de interpretación cambian según el género.",
+                error: "Literalismo extremo. Interpretar metáforas como hechos científicos (ej. 'las alas de Dios') o profecía simbólica como crónica periodística.",
+                question: "¿Cómo comunica el autor su mensaje? ¿Qué tipo de literatura estoy leyendo?",
+                example: "<strong>Salmos vs. Jueces:</strong> Si leemos 'Mata a los hijos de Babilonia contra la roca' (Sal 137) como un mandato ético normativo (narrativa legal) en lugar de un lamento poético imprecatorio (poesía de dolor), justificamos la violencia.",
+                stats: { context: 5, grammar: 6, theology: 4, relevance: 2 },
+                color: "rgba(217, 119, 6, 0.7)" // amber
+            },
+            {
+                id: 4,
+                title: "Método Canónico",
+                short: "4. Canónico",
+                icon: "📖",
+                definition: "Interpreta el pasaje a la luz de todo el libro donde se encuentra y, finalmente, a la luz de toda la Biblia (contexto remoto). La Escritura interpreta a la Escritura.",
+                importance: "Evita sacar textos de contexto. Asegura que nuestra interpretación armonice con la revelación progresiva de Dios.",
+                error: "Aislamiento textual. Crear doctrinas basándose en un solo versículo oscuro que contradice la enseñanza clara del resto de la Biblia.",
+                question: "¿Cómo encaja este pasaje en el argumento del libro y en la totalidad de la Biblia?",
+                example: "<strong>Sacrificios:</strong> Levítico ordena sacrificios de animales. El método canónico nos lleva a Hebreos (NT), que explica que esos sacrificios eran sombra de Cristo y ya no son necesarios. Sin esto, seguiríamos sacrificando corderos.",
+                stats: { context: 6, grammar: 4, theology: 8, relevance: 3 },
+                color: "rgba(234, 179, 8, 0.7)" // yellow
+            },
+            {
+                id: 5,
+                title: "Método Teológico",
+                short: "5. Teológico",
+                icon: "✝️",
+                definition: "Sintetiza las verdades eternas y universales del pasaje. Extrae los principios doctrinales sobre Dios, el hombre, el pecado y la redención.",
+                importance: "Es el puente entre el 'allá y entonces' (historia) y el 'aquí y ahora'. Destila la esencia atemporal del mensaje.",
+                error: "Abstracción filosófica. Crear teología especulativa desconectada del texto bíblico o imponer un sistema teológico previo sobre el texto (eiségesis dogmática).",
+                question: "¿Qué principios eternos y universales sobre Dios y su obra revela este pasaje?",
+                example: "<strong>David y Goliat:</strong> Teológicamente, no es una historia sobre 'vencer a tus gigantes personales' (autoayuda), sino sobre cómo Dios salva a su pueblo a través de un ungido (Mesías) improbable, mostrando que la batalla es de Jehová.",
+                stats: { context: 3, grammar: 3, theology: 10, relevance: 5 },
+                color: "rgba(101, 163, 13, 0.7)" // lime
+            },
+            {
+                id: 6,
+                title: "Método Comparativo",
+                short: "6. Comparativo",
+                icon: "📚",
+                definition: "Consulta la historia de la interpretación. Compara tus conclusiones con las de la iglesia histórica (Credos, Reformadores, Padres de la Iglesia) y comentaristas serios.",
+                importance: "Nos protege de la arrogancia individualista. Si tu interpretación es 'nueva' y nadie en 2000 años la vio, probablemente sea una herejía.",
+                error: "Novedad sectaria. Creer que uno tiene una 'revelación especial' superior a toda la comunidad de fe histórica.",
+                question: "¿Cómo ha entendido la iglesia fiel este pasaje a lo largo de los siglos?",
+                example: "<strong>La Trinidad:</strong> Al estudiar pasajes sobre la deidad de Cristo, el método comparativo nos remite a Nicea y Calcedonia, ayudándonos a usar terminología precisa y evitar errores antiguos como el Arrianismo.",
+                stats: { context: 5, grammar: 5, theology: 7, relevance: 4 },
+                color: "rgba(13, 148, 136, 0.7)" // teal
+            },
+            {
+                id: 7,
+                title: "Método Hermenéutico",
+                short: "7. Aplicación",
+                icon: "🤲",
+                definition: "La aplicación práctica. Trae el principio teológico eterno a la situación específica actual del lector o la congregación.",
+                importance: "Es la meta final. El estudio sin aplicación es abortivo intelectualismo; pero la aplicación sin estudio es emocionalismo peligroso.",
+                error: "Moralismo o Legalismo. Aplicar mandatos culturales antiguos directamente hoy (ej. beso santo) sin pasar por el filtro teológico, o dar consejos de autoayuda sin base bíblica.",
+                question: "¿Cómo debo responder (creer, obedecer, adorar) hoy a esta verdad revelada?",
+                example: "<strong>Idolatría:</strong> No adoramos estatuas de Baal (contexto histórico), pero el principio teológico es que nada debe ocupar el lugar de Dios. Aplicación hoy: ¿Es el dinero, la carrera o la política mi 'Baal' moderno?",
+                stats: { context: 1, grammar: 1, theology: 6, relevance: 10 },
+                color: "rgba(29, 78, 216, 0.7)" // blue
+            }
+        ];
+
+        // --- State Management ---
+        let currentStepIndex = -1; // -1 means welcome screen
+        
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNav();
+            renderSummaryTable();
+            initCharts();
+        });
+
+        // --- Core Logic ---
+        function renderNav() {
+            const navList = document.getElementById('nav-list');
+            navList.innerHTML = '';
+            
+            methodsData.forEach((step, index) => {
+                const btn = document.createElement('div');
+                btn.className = `step-card p-4 rounded mb-2 flex items-center group ${index === currentStepIndex ? 'active' : 'hover:bg-gray-50'}`;
+                btn.onclick = () => selectStep(index);
+                
+                btn.innerHTML = `
+                    <div class="flex-shrink-0 mr-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 font-bold text-sm group-hover:bg-blue-50 group-hover:text-[#1a2b49] transition-colors">
+                        ${index + 1}
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="text-sm font-bold text-gray-700 group-hover:text-[#1a2b49]">${step.title}</h4>
+                        <p class="text-xs text-gray-500 truncate">${step.definition.substring(0, 40)}...</p>
+                    </div>
+                    <div class="text-gray-300">
+                        ${index === currentStepIndex ? '▶' : '›'}
+                    </div>
+                `;
+                navList.appendChild(btn);
+            });
+        }
+
+        function selectStep(index) {
+            currentStepIndex = index;
+            renderNav(); // Update active state styling
+            renderContent(index);
+            updateRadarChart(index);
+        }
+
+        function renderContent(index) {
+            const data = methodsData[index];
+            const contentArea = document.getElementById('content-area');
+            
+            // Animation reset
+            contentArea.style.opacity = '0';
+            
+            setTimeout(() => {
+                contentArea.innerHTML = `
+                    <div class="p-8 pb-4 border-b border-gray-100 bg-blue-50/30">
+                        <div class="flex items-center mb-4">
+                            <span class="text-4xl mr-4">${data.icon}</span>
+                            <div>
+                                <h4 class="text-xs font-bold text-[#d4af37] uppercase tracking-widest mb-1">Paso ${index + 1} del Método</h4>
+                                <h2 class="text-3xl font-bold text-[#1a2b49] serif">${data.title}</h2>
+                            </div>
+                        </div>
+                        <p class="text-lg text-gray-700 leading-relaxed font-serif italic border-l-4 border-[#d4af37] pl-4 py-2 bg-white rounded-r">
+                            "${data.definition}"
+                        </p>
+                    </div>
+                    
+                    <div class="p-8 content-scroll overflow-y-auto" style="max-height: 600px;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div>
+                                <h3 class="flex items-center text-sm font-bold text-[#1a2b49] uppercase tracking-wide mb-3">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span> ¿Por qué es Vital?
+                                </h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-6">${data.importance}</p>
+                                
+                                <h3 class="flex items-center text-sm font-bold text-[#1a2b49] uppercase tracking-wide mb-3">
+                                    <span class="w-2 h-2 bg-amber-500 rounded-full mr-2"></span> Pregunta Clave
+                                </h3>
+                                <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg text-blue-900 font-medium text-sm">
+                                    ❓ ${data.question}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="flex items-center text-sm font-bold text-[#1a2b49] uppercase tracking-wide mb-3">
+                                    <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span> Peligro al Omitirlo
+                                </h3>
+                                <p class="text-gray-600 text-sm leading-relaxed mb-6 bg-red-50/50 p-3 rounded border border-red-50">${data.error}</p>
+
+                                <h3 class="flex items-center text-sm font-bold text-[#1a2b49] uppercase tracking-wide mb-3">
+                                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span> Ejemplo Bíblico
+                                </h3>
+                                <div class="bg-gray-50 border border-gray-200 p-4 rounded-lg text-gray-700 text-sm">
+                                    ${data.example}
+                                </div>
+                            </div>
+                        </div>
+
+                        ${index < 6 ? `
+                        <div class="flex justify-end mt-4 pt-4 border-t border-gray-100">
+                            <button onclick="selectStep(${index + 1})" class="flex items-center text-[#1a2b49] hover:text-[#0f1a2e] font-bold text-sm transition-colors">
+                                Siguiente Paso: ${methodsData[index+1].title} &rarr;
+                            </button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                contentArea.style.opacity = '1';
+                contentArea.style.transition = 'opacity 0.3s ease-in';
+            }, 200);
+        }
+
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summary-table-body');
+            methodsData.forEach((step, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                tr.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-xs font-bold text-gray-500">${idx + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${step.title}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 italic">"${step.question}"</td>
+                    <td class="px-6 py-4 text-sm text-red-600">${step.error}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Charts Implementation ---
+        
+        let radarChartInstance = null;
+        let funnelChartInstance = null;
+
+        function initCharts() {
+            // 1. Radar Chart (Interactive)
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            radarChartInstance = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Contexto', 'Gramática/Texto', 'Teología', 'Relevancia Actual'],
+                    datasets: [{
+                        label: 'Foco del Método Actual',
+                        data: [0, 0, 0, 0], // Start empty
+                        backgroundColor: 'rgba(212, 175, 55, 0.2)',
+                        borderColor: 'rgba(212, 175, 55, 1)',
+                        pointBackgroundColor: 'rgba(26, 43, 73, 1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Equilibrio Ideal',
+                        data: [10, 10, 10, 10], // The goal
+                        backgroundColor: 'transparent',
+                        borderColor: 'rgba(150, 150, 150, 0.3)',
+                        borderDash: [5, 5],
+                        borderWidth: 1,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: {
+                                font: { size: 11, family: 'Lato' },
+                                color: '#4b5563'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10,
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 2. Funnel Chart (Visual Metaphor using Bar Chart)
+            // Represents narrowing from Historical (Wide) to Application (Point)
+            const ctxFunnel = document.getElementById('funnelChart').getContext('2d');
+            
+            // Logic to create a centered funnel shape using floating bars
+            // Total width 20. 
+            // Step 1: Width 20 (Start -10, End 10)
+            // Step 7: Width 2 (Start -1, End 1)
+            const funnelData = [
+                { y: '1. Histórico', min: -10, max: 10 },
+                { y: '2. Gramatical', min: -8.5, max: 8.5 },
+                { y: '3. Literario', min: -7, max: 7 },
+                { y: '4. Canónico', min: -5.5, max: 5.5 },
+                { y: '5. Teológico', min: -4, max: 4 },
+                { y: '6. Comparativo', min: -2.5, max: 2.5 },
+                { y: '7. Aplicación', min: -1, max: 1 },
+            ];
+
+            funnelChartInstance = new Chart(ctxFunnel, {
+                type: 'bar',
+                data: {
+                    labels: funnelData.map(d => d.y),
+                    datasets: [{
+                        label: 'Amplitud de Enfoque',
+                        data: funnelData.map(d => [d.min, d.max]),
+                        backgroundColor: [
+                            '#1a2b49', '#2c3e50', '#475569', '#64748b', '#94a3b8', '#cbd5e1', '#d4af37'
+                        ],
+                        borderRadius: 4,
+                        barPercentage: 0.8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            display: false, // Hide x axis numbers
+                            min: -11,
+                            max: 11
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+        }
+
+        function updateRadarChart(index) {
+            if (!radarChartInstance) return;
+            
+            const stats = methodsData[index].stats;
+            // Update data
+            radarChartInstance.data.datasets[0].data = [
+                stats.context,
+                stats.grammar,
+                stats.theology,
+                stats.relevance
+            ];
+            radarChartInstance.data.datasets[0].label = methodsData[index].short;
+            
+            // Re-render
+            radarChartInstance.update();
+        }
+
+        // --- Modal Logic ---
+        function openModal(element) {
+            const modal = document.getElementById('sysModal');
+            const modalImg = document.getElementById('sysModalImg');
+            modal.classList.remove('hidden');
+            modalImg.src = element.src;
+        }
+        function closeModal() {
+            document.getElementById('sysModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

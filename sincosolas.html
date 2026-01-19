@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Las Cinco Solas: Recuperando el Evangelio</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lato:wght@300;400;700&family=Merriweather:ital,wght@0,300;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Styles & Utilities */
+        :root {
+            --paper-bg: #fdfbf7;
+            --ink-primary: #1a202c;
+            --accent-gold: #d4af37;
+            --accent-burgundy: #741b1b;
+            --accent-blue: #1e3a8a;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--paper-bg);
+            color: var(--ink-primary);
+        }
+
+        h1, h2, h3, .serif-title {
+            font-family: 'Cinzel', serif;
+        }
+
+        .prose-text {
+            font-family: 'Merriweather', serif;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Interactive Card Styles */
+        .sola-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+
+        .sola-card:hover {
+            transform: translateX(5px);
+            background-color: #f3f4f6;
+        }
+
+        .sola-card.active {
+            border-left: 4px solid var(--accent-burgundy);
+            background-color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .verse-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timeline-dot {
+            transition: all 0.3s;
+        }
+        .timeline-dot:hover {
+            transform: scale(1.2);
+            background-color: var(--accent-burgundy);
+        }
+
+    </style>
+
+    <!-- Placeholder Comments Required by Prompt -->
+    <!-- Chosen Palette: Warm Neutral/Old Paper (Background: #fdfbf7) with Classic Academic Accents (Burgundy #741b1b, Navy #1e3a8a, Gold #d4af37) to reflect historical gravity and theological richness. -->
+    
+    <!-- Application Structure Plan: 
+         1. Hero Section: Introduces the Reformation context (Post Tenebras Lux).
+         2. Interactive Dashboard (The Core): A split-view interface. 
+            - Left: Navigation list of the 5 Solas.
+            - Right: Dynamic content area showing Definition, History, Bible, and Theology for the selected Sola.
+            - Reasoning: Allows users to study each doctrine deeply without navigating away or getting lost in a long scroll.
+         3. Conceptual Visualization: Chart.js graphs comparing Roman Catholic vs. Reformed views on Authority and Salvation. 
+            - Reasoning: Makes abstract theological differences visually concrete.
+         4. Historical Timeline: A horizontal scrollable timeline of key events.
+         5. Reflection/Application: Synthesis for the modern believer.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Interactive Text/Cards: For "Biblical Basis" to allow exegesis disclosure on demand (Goal: Inform/Teach).
+         2. Doughnut Chart: "Sources of Authority" (Scripture vs Tradition) (Goal: Compare/Contrast).
+         3. Stacked Bar Chart: "Basis of Justification" (Faith alone vs Faith + Works) (Goal: Compare).
+         4. Dynamic Lists: Timeline events (Goal: Chronology).
+         5. No SVG/Mermaid: All icons use Unicode or pure CSS; Charts use Chart.js.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header / Hero -->
+    <header class="bg-[#1a202c] text-[#fdfbf7] py-12 px-4 shadow-lg border-b-4 border-[#d4af37]">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-[#d4af37] tracking-widest text-sm uppercase mb-2">Teología Histórica y Sistemática</p>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Las Cinco Solas</h1>
+            <h2 class="text-xl md:text-2xl font-light italic text-gray-300">"Post Tenebras Lux" — Después de las tinieblas, luz</h2>
+            <p class="mt-6 max-w-2xl mx-auto prose-text text-gray-400 leading-relaxed">
+                Una exploración interactiva de los pilares doctrinales que transformaron la Iglesia Occidental en el siglo XVI, recuperando la autoridad bíblica y la pureza del Evangelio.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Navigation / Filter -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex overflow-x-auto md:justify-center space-x-2 py-4 no-scrollbar">
+                <button onclick="app.setView('dashboard')" class="nav-btn px-4 py-2 rounded-full text-sm font-bold bg-[#741b1b] text-white hover:bg-[#5a1515] transition whitespace-nowrap" id="btn-dashboard">
+                    🏛️ Doctrina y Exégesis
+                </button>
+                <button onclick="app.setView('comparison')" class="nav-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition whitespace-nowrap" id="btn-comparison">
+                    ⚖️ Comparativa Teológica
+                </button>
+                <button onclick="app.setView('timeline')" class="nav-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition whitespace-nowrap" id="btn-timeline">
+                    ⏳ Línea de Tiempo
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
+
+        <!-- VIEW: DASHBOARD (The 5 Solas Detail) -->
+        <div id="view-dashboard" class="fade-in">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-[#1e3a8a] serif-title mb-2">Exploración Doctrinal</h3>
+                <p class="text-gray-600">Seleccione una de las "Solas" en el panel izquierdo para profundizar en su definición, contexto histórico, base bíblica y aplicación teológica.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Sidebar Selector -->
+                <div class="lg:col-span-3 space-y-2">
+                    <div id="sola-list" class="space-y-2">
+                        <!-- JS generated buttons -->
+                    </div>
+                </div>
+
+                <!-- Content Display -->
+                <div class="lg:col-span-9 bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200 min-h-[600px]" id="content-display">
+                    <!-- Dynamic Content Loaded Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: COMPARISON (Charts) -->
+        <div id="view-comparison" class="hidden fade-in">
+            <div class="mb-8 text-center max-w-3xl mx-auto">
+                <h3 class="text-3xl font-bold text-[#1e3a8a] serif-title mb-4">El Contraste Teológico</h3>
+                <p class="text-gray-700 prose-text">
+                    La Reforma no fue una invención de nuevas doctrinas, sino una recuperación. Las siguientes visualizaciones muestran conceptualmente la diferencia fundamental entre la estructura de autoridad y salvación de la Iglesia Medieval y la Teología Reformada.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mt-8">
+                
+                <!-- Chart 1: Authority -->
+                <div class="bg-white p-6 rounded-lg shadow border-t-4 border-[#741b1b]">
+                    <h4 class="text-xl font-bold text-center mb-2">Fuente de Autoridad Suprema</h4>
+                    <p class="text-sm text-center text-gray-500 mb-6 italic">¿Quién tiene la última palabra sobre la conciencia?</p>
+                    <div class="chart-container">
+                        <canvas id="authorityChart"></canvas>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded text-sm text-gray-600">
+                        <p><strong>Roma:</strong> Escritura + Tradición + Magisterio (Tres pilares iguales).</p>
+                        <p class="mt-2"><strong>Reforma (Sola Scriptura):</strong> La Escritura es la única norma de fe y práctica infalible (Norma Normans).</p>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Justification -->
+                <div class="bg-white p-6 rounded-lg shadow border-t-4 border-[#d4af37]">
+                    <h4 class="text-xl font-bold text-center mb-2">Base de la Justificación</h4>
+                    <p class="text-sm text-center text-gray-500 mb-6 italic">¿En qué se basa Dios para declarar justo a un pecador?</p>
+                    <div class="chart-container">
+                        <canvas id="salvationChart"></canvas>
+                    </div>
+                    <div class="mt-4 bg-gray-50 p-4 rounded text-sm text-gray-600">
+                        <p><strong>Roma:</strong> Gracia infusa + Mérito propio + Mérito de Santos (Sinergismo).</p>
+                        <p class="mt-2"><strong>Reforma (Solus Christus):</strong> La justicia de Cristo imputada al creyente (Monergismo en la regeneración).</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW: TIMELINE -->
+        <div id="view-timeline" class="hidden fade-in">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-[#1e3a8a] serif-title">Cronología de la Reforma</h3>
+                <p class="text-gray-600">Eventos clave que forjaron la formulación de las Cinco Solas.</p>
+            </div>
+            
+            <div class="relative border-l-4 border-[#741b1b] ml-4 md:ml-8 space-y-8 py-4" id="timeline-container">
+                <!-- JS Generated Timeline Items -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-8 mt-auto border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2 text-[#d4af37]">Soli Deo Gloria</p>
+            <p class="text-sm">Recurso educativo diseñado para el estudio de la Teología Histórica y Sistemática.</p>
+            <p class="text-xs mt-4 opacity-50">YO, RENACERE 2026</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- DATA STORE ---
+        const solasData = {
+            scriptura: {
+                title: "Sola Scriptura",
+                subtitle: "Solo la Escritura",
+                icon: "📜",
+                definition: "La Biblia es la única Palabra de Dios inspirada, inerrante y la autoridad final en asuntos de fe y práctica. Ningún concilio, papa o tradición tiene autoridad igual o superior a ella.",
+                context: "En la Edad Media, la Iglesia Católica enseñaba que la autoridad residía en 'Escritura + Tradición + Magisterio'. La tradición a menudo contradecía la Biblia (ej. indulgencias, purgatorio). Martín Lutero, en la Dieta de Worms (1521), declaró: 'Mi conciencia está cautiva de la Palabra de Dios'.",
+                theology: "Establece la distinción entre 'Norma Normans' (norma que normaliza - Biblia) y 'Norma Normata' (norma normalizada - credos/confesiones). Responde al problema de la autoridad epistemológica en la fe.",
+                verses: [
+                    { ref: "2 Timoteo 3:16-17", text: "Toda la Escritura es inspirada por Dios, y útil para enseñar, para redargüir, para corregir, para instruir en justicia...", exegesis: "La palabra 'theopneustos' (inspirada por Dios) indica que el origen de la Escritura es divino, no humano. Es 'útil' (suficiente) para equipar al creyente completamente." },
+                    { ref: "Mateo 15:6", text: "...habéis invalidado el mandamiento de Dios por vuestra tradición.", exegesis: "Jesús mismo condena elevar la tradición humana al nivel de autoridad divina cuando esta contradice la Revelación escrita." }
+                ],
+                color: "bg-amber-100 border-amber-500 text-amber-900"
+            },
+            fide: {
+                title: "Sola Fide",
+                subtitle: "Solo la Fe",
+                icon: "🛡️",
+                definition: "La justificación es recibida únicamente a través de la fe, sin ninguna mezcla de buenas obras o méritos humanos. La fe es la mano vacía que recibe la justicia de Cristo.",
+                context: "La iglesia medieval enseñaba que la fe debía ser completada con obras de caridad y penitencia para merecer la vida eterna. Lutero sufrió angustia espiritual hasta entender que la 'justicia de Dios' es un regalo recibido, no un premio ganado.",
+                theology: "Responde a la pregunta: '¿Qué debo hacer para ser salvo?'. Diferencia clave: El catolicismo enseña una justificación procesual e intrínseca (hacerse justo); la Reforma enseña una justificación declarativa y forense (ser declarado justo).",
+                verses: [
+                    { ref: "Romanos 1:17", text: "Mas el justo por la fe vivirá.", exegesis: "Texto clave para Lutero. La justicia que salva no es la que el hombre produce activamente, sino la que recibe pasivamente por la fe en la promesa de Dios." },
+                    { ref: "Efesios 2:8-9", text: "Porque por gracia sois salvos por medio de la fe; y esto no de vosotros, pues es don de Dios; no por obras...", exegesis: "Pablo excluye explícitamente las obras ('no por obras') como causa o medio de la salvación, dejando la fe como el único instrumento receptor." }
+                ],
+                color: "bg-blue-100 border-blue-500 text-blue-900"
+            },
+            gratia: {
+                title: "Sola Gratia",
+                subtitle: "Solo la Gracia",
+                icon: "🎁",
+                definition: "La salvación es un regalo inmerecido de Dios, otorgado no por méritos vistos o previstos en el hombre, sino únicamente por la benevolencia soberana de Dios.",
+                context: "El sistema de méritos, peregrinaciones e indulgencias sugería que el hombre podía 'comprar' o contribuir al favor de Dios. Pelagio (s. V) y el semi-pelagianismo medieval elevaban la capacidad humana.",
+                theology: "Monergismo vs. Sinergismo. La Reforma enseña que el hombre está espiritualmente muerto (Efesios 2:1) y no puede cooperar hasta que la Gracia lo vivifica. La salvación es 100% obra de Dios.",
+                verses: [
+                    { ref: "Romanos 11:6", text: "Y si por gracia, ya no es por obras; de otra manera la gracia ya no es gracia.", exegesis: "Gracia y mérito son mutuamente excluyentes. Si el hombre pone el 1%, la gracia deja de ser un regalo gratuito." },
+                    { ref: "Efesios 2:4-5", text: "Aun estando nosotros muertos en pecados, nos dio vida juntamente con Cristo...", exegesis: "Un cadáver no puede cooperar. La gracia es el poder que resucita al pecador para que pueda creer." }
+                ],
+                color: "bg-red-100 border-red-500 text-red-900"
+            },
+            christus: {
+                title: "Solus Christus",
+                subtitle: "Solo Cristo",
+                icon: "✝️",
+                definition: "Jesucristo es el único mediador entre Dios y los hombres. Su vida perfecta y su muerte expiatoria son la única base de nuestra aceptación ante Dios.",
+                context: "La piedad medieval dirigía a los fieles a María, a los santos y a los sacerdotes como mediadores necesarios. Cristo era visto a menudo como un juez severo que necesitaba ser apaciguado por su madre.",
+                theology: "Afirma la suficiencia de la expiación de Cristo. Rechaza el sacerdocio mediador de la iglesia; todos los creyentes tienen acceso directo al Padre a través del Hijo.",
+                verses: [
+                    { ref: "1 Timoteo 2:5", text: "Porque hay un solo Dios, y un solo mediador entre Dios y los hombres, Jesucristo hombre.", exegesis: "La exclusividad de la mediación de Cristo elimina la necesidad de cualquier otro intercesor celestial o terrenal para la salvación." },
+                    { ref: "Hechos 4:12", text: "Y en ningún otro hay salvación; porque no hay otro nombre bajo el cielo... en que podamos ser salvos.", exegesis: "Pedro afirma categóricamente que la salvación reside exclusivamente en la persona y obra de Jesús." }
+                ],
+                color: "bg-purple-100 border-purple-500 text-purple-900"
+            },
+            deo: {
+                title: "Soli Deo Gloria",
+                subtitle: "Solo a Dios la Gloria",
+                icon: "👑",
+                definition: "El propósito supremo de la salvación y de toda la creación es la gloria de Dios. No la gloria de la Iglesia, ni de los santos, ni del jerarca.",
+                context: "La iglesia institucional a menudo acumulaba poder y gloria para sí misma. La teología reformada reorientó toda la vida (no solo lo religioso) para ser vivida 'Coram Deo' (delante de Dios).",
+                theology: "Si la salvación es por obras humanas, el hombre comparte la gloria. Si es solo por gracia, solo Dios recibe la gloria. Santifica también las vocaciones 'seculares' (trabajo, arte, ciencia) como adoración.",
+                verses: [
+                    { ref: "Romanos 11:36", text: "Porque de él, y por él, y para él, son todas las cosas. A él sea la gloria por los siglos.", exegesis: "El origen, el medio y el fin de todo lo que existe es Dios mismo. Nada existe independientemente de Su propósito." },
+                    { ref: "Isaías 42:8", text: "Yo Jehová; este es mi nombre; y a otro no daré mi gloria, ni mi alabanza a esculturas.", exegesis: "Dios es celoso de su gloria; el sistema de veneración de imágenes y santos robaba la adoración exclusiva que Él merece." }
+                ],
+                color: "bg-slate-100 border-slate-500 text-slate-900"
+            }
+        };
+
+        const timelineData = [
+            { year: "1516", event: "Erasmo publica el Nuevo Testamento Griego", desc: "Permitió a los eruditos ver los errores de la Vulgata Latina." },
+            { year: "1517", event: "Lutero clava las 95 Tesis", desc: "Protesta contra la venta de indulgencias en Wittenberg. Inicio simbólico de la Reforma." },
+            { year: "1519", event: "Disputa de Leipzig", desc: "Lutero afirma que 'Sola Scriptura' está por encima del Papa y los concilios." },
+            { year: "1521", event: "Dieta de Worms", desc: "Lutero es excomulgado pero rehúsa retractarse sin pruebas bíblicas." },
+            { year: "1536", event: "Calvino publica 'La Institución'", desc: "Obra magna que sistematiza la teología reformada y las Cinco Solas." },
+            { year: "1545", event: "Concilio de Trento", desc: "La Contrarreforma Católica condena oficialmente las Cinco Solas como herejías." }
+        ];
+
+        // --- APP STATE ---
+        const app = {
+            currentSola: 'scriptura',
+            view: 'dashboard',
+
+            init() {
+                this.renderSolaList();
+                this.loadSolaContent('scriptura');
+                this.renderTimeline();
+                this.initCharts();
+            },
+
+            setView(viewName) {
+                // Hide all views
+                document.getElementById('view-dashboard').classList.add('hidden');
+                document.getElementById('view-comparison').classList.add('hidden');
+                document.getElementById('view-timeline').classList.add('hidden');
+                
+                // Reset buttons
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('bg-[#741b1b]', 'text-white');
+                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                });
+
+                // Show active view
+                document.getElementById(`view-${viewName}`).classList.remove('hidden');
+                
+                // Style active button
+                const activeBtn = document.getElementById(`btn-${viewName}`);
+                activeBtn.classList.remove('bg-gray-200', 'text-gray-700');
+                activeBtn.classList.add('bg-[#741b1b]', 'text-white');
+
+                this.view = viewName;
+            },
+
+            renderSolaList() {
+                const container = document.getElementById('sola-list');
+                container.innerHTML = '';
+                Object.keys(solasData).forEach(key => {
+                    const data = solasData[key];
+                    const div = document.createElement('div');
+                    div.className = `sola-card p-4 rounded bg-white border border-gray-100 flex items-center gap-4 ${key === this.currentSola ? 'active' : ''}`;
+                    div.onclick = () => this.loadSolaContent(key);
+                    div.innerHTML = `
+                        <div class="text-2xl">${data.icon}</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">${data.title}</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-wide">${data.subtitle}</p>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            loadSolaContent(key) {
+                this.currentSola = key;
+                this.renderSolaList(); // Update active state styling
+                
+                const data = solasData[key];
+                const container = document.getElementById('content-display');
+                
+                // Fade effect
+                container.classList.remove('fade-in');
+                void container.offsetWidth; // trigger reflow
+                container.classList.add('fade-in');
+
+                container.innerHTML = `
+                    <div class="border-b pb-6 mb-6">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-4xl">${data.icon}</span>
+                            <h2 class="text-3xl md:text-4xl font-bold text-[#741b1b] serif-title">${data.title}</h2>
+                        </div>
+                        <h3 class="text-xl text-gray-500 italic mb-4">${data.subtitle}</h3>
+                        <p class="text-lg leading-relaxed prose-text text-gray-800">${data.definition}</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold text-[#1e3a8a] mb-3 border-b border-gray-200 pb-1">🔍 Contexto Histórico</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed mb-6 bg-gray-50 p-3 rounded border-l-2 border-[#1e3a8a]">${data.context}</p>
+
+                            <h4 class="font-bold text-[#1e3a8a] mb-3 border-b border-gray-200 pb-1">🎓 Enfoque Teológico</h4>
+                            <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 p-3 rounded border-l-2 border-[#1e3a8a]">${data.theology}</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-[#741b1b] mb-3 border-b border-gray-200 pb-1">📖 Fundamento Bíblico</h4>
+                            <p class="text-xs text-gray-500 mb-3 italic">Haga clic en los versículos para ver la exégesis.</p>
+                            <div class="space-y-3">
+                                ${data.verses.map((verse, index) => `
+                                    <div onclick="toggleVerse(this)" class="verse-card bg-white border border-gray-200 rounded p-4 shadow-sm hover:shadow-md transition">
+                                        <div class="font-bold text-[#741b1b] flex justify-between">
+                                            <span>${verse.ref}</span>
+                                            <span class="text-xs text-gray-400">▼</span>
+                                        </div>
+                                        <p class="text-gray-800 italic mt-2 font-serif">"${verse.text}"</p>
+                                        <div class="hidden mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600 bg-amber-50 p-2 rounded">
+                                            <strong>Exégesis:</strong> ${verse.exegesis}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderTimeline() {
+                const container = document.getElementById('timeline-container');
+                timelineData.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "relative pl-8 md:pl-12";
+                    div.innerHTML = `
+                        <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-white border-4 border-[#741b1b] timeline-dot"></div>
+                        <div class="flex flex-col md:flex-row md:items-baseline gap-2">
+                            <span class="text-xl font-bold text-[#d4af37] font-serif">${item.year}</span>
+                            <h4 class="font-bold text-gray-900">${item.event}</h4>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-1 max-w-2xl">${item.desc}</p>
+                    `;
+                    container.appendChild(div);
+                });
+            },
+
+            initCharts() {
+                // Chart 1: Authority
+                const ctxAuthority = document.getElementById('authorityChart').getContext('2d');
+                new Chart(ctxAuthority, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Escritura', 'Tradición', 'Magisterio Papa'],
+                        datasets: [{
+                            label: 'Peso de Autoridad (Roma)',
+                            data: [33, 33, 33],
+                            backgroundColor: ['#e5e7eb', '#d1d5db', '#9ca3af'],
+                            borderWidth: 1,
+                            hoverOffset: 4
+                        },
+                        {
+                            label: 'Peso de Autoridad (Reforma)',
+                            data: [100, 0, 0],
+                            backgroundColor: ['#741b1b', 'transparent', 'transparent'],
+                            borderWidth: 1,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if(context.datasetIndex === 1 && context.parsed > 0) return "Sola Scriptura: 100% Autoridad Suprema";
+                                        if(context.datasetIndex === 0) return "Roma: Autoridad Dividida";
+                                        return "";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Chart 2: Salvation Basis
+                const ctxSalvation = document.getElementById('salvationChart').getContext('2d');
+                new Chart(ctxSalvation, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Teología Medieval', 'Teología Reformada'],
+                        datasets: [
+                            {
+                                label: 'Obra de Cristo (Gracia)',
+                                data: [50, 100],
+                                backgroundColor: '#741b1b',
+                            },
+                            {
+                                label: 'Mérito Humano / Obras',
+                                data: [50, 0],
+                                backgroundColor: '#d4af37',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { stacked: true },
+                            y: { 
+                                stacked: true, 
+                                max: 100,
+                                ticks: { callback: (val) => val + '%' }
+                            }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function(context) {
+                                        if (context[0].label === 'Teología Reformada') return "Toda la gloria es para Dios (Soli Deo Gloria).";
+                                        return "Sinergismo: Dios y el hombre cooperan.";
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+
+        // Helper function for verse toggling
+        function toggleVerse(element) {
+            const exegesis = element.querySelector('div.hidden, div.block');
+            const arrow = element.querySelector('span.text-xs');
+            
+            if (exegesis.classList.contains('hidden')) {
+                exegesis.classList.remove('hidden');
+                exegesis.classList.add('block', 'fade-in');
+                arrow.textContent = '▲';
+                element.classList.add('bg-amber-50');
+            } else {
+                exegesis.classList.add('hidden');
+                exegesis.classList.remove('block');
+                arrow.textContent = '▼';
+                element.classList.remove('bg-amber-50');
+            }
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>
